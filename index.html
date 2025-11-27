@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>الرئيسية - BigZero</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      padding: 24px 24px 28px;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status--ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px #2563eb33;
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #2563eb;
+      color: #ffffff;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #111827;
+      margin-top: 4px;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .links {
+      margin-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 14px;
+    }
+
+    .links-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .links-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .links-list a {
+      font-size: 14px;
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .links-list a:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      font-size: 12px;
+      color: #b91c1c;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="card">
+      <div class="card-header">
+        <div class="title">لوحة التحكم</div>
+        <div id="statusBadge" class="status">جاري التحقق...</div>
+      </div>
+
+      <p class="hint">
+        هذه الصفحة متاحة فقط للمستخدمين المسجلين. سيتم تحويلك إلى صفحة تسجيل الدخول في حالة عدم تسجيل الدخول.
+      </p>
+
+      <div id="linksSection" class="links hidden">
+        <div class="links-title">الصفحات المتاحة:</div>
+        <ul class="links-list">
+          <li><a href="products.html">صفحة المنتجات</a></li>
+          <li><a href="categories.html">صفحة التصنيفات</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const LOGIN_KEY = "bigzero_is_logged_in";
+    const linksSection = document.getElementById("linksSection");
+    const statusBadge = document.getElementById("statusBadge");
+
+    function protectPage() {
+      const isLoggedIn = localStorage.getItem(LOGIN_KEY) === "true";
+
+      if (!isLoggedIn) {
+        statusBadge.textContent = "غير مسجل";
+        statusBadge.classList.remove("status--ok");
+        statusBadge.classList.add("status");
+        // غيّر login.html إلى اسم صفحة تسجيل الدخول الفعلي عندك
+        window.location.href = "login.html";
+        return;
+      }
+
+      // المستخدم مسجّل
+      linksSection.classList.remove("hidden");
+      statusBadge.textContent = "مسجّل";
+      statusBadge.classList.add("status--ok");
+    }
+
+    // عند فتح الصفحة
+    protectPage();
+  </script>
+</body>
+</html>

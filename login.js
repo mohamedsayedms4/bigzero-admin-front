@@ -79,11 +79,15 @@ async function handleLogin(event) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         
+        // علامة بسيطة لاستخدامها في حماية index.html
+        localStorage.setItem('bigzero_is_logged_in', 'true');
+        
         showAlert('تم تسجيل الدخول بنجاح! 🎉', 'success');
         
+        // تحويل مباشر إلى الصفحة الرئيسية بعد لحظات قصيرة
         setTimeout(() => {
-            loadDashboard();
-        }, 1000);
+            window.location.href = 'index.html';
+        }, 700);
         
     } catch (error) {
         showAlert(error.message, 'error');
@@ -127,11 +131,15 @@ async function handleSignup(event) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         
+        // علامة بسيطة لاستخدامها في حماية index.html
+        localStorage.setItem('bigzero_is_logged_in', 'true');
+        
         showAlert('تم إنشاء الحساب بنجاح! 🎉', 'success');
         
+        // تحويل مباشر إلى الصفحة الرئيسية بعد لحظات قصيرة
         setTimeout(() => {
-            loadDashboard();
-        }, 1000);
+            window.location.href = 'index.html';
+        }, 700);
         
     } catch (error) {
         showAlert(error.message, 'error');

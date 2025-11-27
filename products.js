@@ -957,7 +957,7 @@ function showAlert(message, type = 'success') {
 
 // العودة للوحة التحكم
 function goToDashboard() {
-    window.location.href = 'dashboard.html';
+    window.location.href = 'index.html';
 }
 
 // إغلاق النماذج عند النقر خارج المحتوى
