@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة التصنيفات - متجر الموبايل</title>
+    <link rel="stylesheet" href="categories.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-tags"></i> إدارة التصنيفات</h1>
+                <p>إدارة وتنظيم تصنيفات المنتجات في المتجر</p>
+            </div>
+            <button class="btn btn-back" onclick="goToDashboard()">
+                <i class="fas fa-arrow-right"></i> العودة للرئيسية
+            </button>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertMessage" class="alert"></div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Add Category Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-plus-circle"></i> 
+                        <span id="formTitle">إضافة تصنيف جديد</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="categoryForm" enctype="multipart/form-data">
+                        <input type="hidden" id="categoryId">
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="categoryNameAr">اسم التصنيف (عربي) *</label>
+                                <input type="text" id="categoryNameAr" required 
+                                       placeholder="أدخل اسم التصنيف بالعربية">
+                                <span class="error-message" id="nameArError"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="categoryNameEn">اسم التصنيف (إنجليزي) *</label>
+                                <input type="text" id="categoryNameEn" required 
+                                       placeholder="أدخل اسم التصنيف بالإنجليزية">
+                                <span class="error-message" id="nameEnError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="categoryCustomId">معرف التصنيف المخصص</label>
+                                <input type="text" id="categoryCustomId" 
+                                       placeholder="معرف فريد للتصنيف (اختياري)">
+                                <span class="help-text">يستخدم للربط مع أنظمة خارجية</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="parentCategory">التصنيف الرئيسي</label>
+                                <div class="select-with-refresh">
+                                    <select id="parentCategory">
+                                        <option value="">جاري تحميل التصنيفات...</option>
+                                    </select>
+                                    <button type="button" class="btn-refresh-small" onclick="loadParentCategories()" title="تحديث القائمة">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="categoryLevel">مستوى التصنيف</label>
+                                <select id="categoryLevel">
+                                    <option value="0">مستوى 0 (رئيسي)</option>
+                                    <option value="1">مستوى 1</option>
+                                    <option value="2">مستوى 2</option>
+                                    <option value="3">مستوى 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="categoryImage">صورة التصنيف</label>
+                                <div class="file-upload">
+                                    <input type="file" id="categoryImage" 
+                                           accept="image/*" class="file-input">
+                                    <div class="file-upload-label">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>اختر صورة للتصنيف</span>
+                                    </div>
+                                </div>
+                                <div id="imagePreview" class="image-preview"></div>
+                                <span class="error-message" id="imageError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-plus"></i> إضافة تصنيف
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()" id="cancelBtn" style="display: none;">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Categories List -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> قائمة التصنيفات</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-refresh" onclick="loadCategories()">
+                            <i class="fas fa-sync-alt"></i> تحديث
+                        </button>
+                        <button class="btn btn-info" onclick="toggleViewMode()" id="viewModeBtn">
+                            <i class="fas fa-sitemap"></i> عرض الشجرة
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tree View -->
+                    <div id="treeView" class="tree-view" style="display: none;">
+                        <div class="tree-container" id="categoryTree">
+                            <!-- سيتم عرض الشجرة الهيكلية هنا -->
+                        </div>
+                    </div>
+
+                    <!-- Table View -->
+                    <div id="tableView">
+                        <div class="table-container">
+                            <table id="categoriesTable">
+                                <thead>
+                                    <tr>
+                                        <th>الصورة</th>
+                                        <th>الاسم العربي</th>
+                                        <th>الاسم الإنجليزي</th>
+                                        <th>المعرف المخصص</th>
+                                        <th>المستوى</th>
+                                        <th>التصنيف الرئيسي</th>
+                                        <th>الفرعية</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriesTableBody">
+                                    <!-- Categories will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="loadingState" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>جاري تحميل التصنيفات...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <i class="fas fa-tags"></i>
+                        <h3>لا توجد تصنيفات</h3>
+                        <p>لم يتم إضافة أي تصنيفات بعد. ابدأ بإضافة تصنيف جديد.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> تأكيد الحذف</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من أنك تريد حذف هذا التصنيف؟</p>
+                <p class="text-warning" id="deleteWarningText">هذا الإجراء لا يمكن التراجع عنه!</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> نعم، احذف
+                </button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Children Categories Modal -->
+    <div id="childrenModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sitemap"></i> التصنيفات الفرعية</h3>
+                <button class="modal-close" onclick="closeChildrenModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="childrenListContent" class="children-list-content">
+                    <!-- سيتم عرض التصنيفات الفرعية هنا -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeChildrenModal()">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="categories.js"></script>
+</body>
+</html>

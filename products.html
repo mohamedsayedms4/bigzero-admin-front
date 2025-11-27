@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المنتجات - متجر الموبايل</title>
+    <link rel="stylesheet" href="products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-boxes"></i> إدارة المنتجات</h1>
+                <p>إدارة وعرض منتجات المتجر</p>
+            </div>
+            <button class="btn btn-back" onclick="goToDashboard()">
+                <i class="fas fa-arrow-right"></i> العودة للرئيسية
+            </button>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertMessage" class="alert"></div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Add Product Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-plus-circle"></i> 
+                        <span id="formTitle">إضافة منتج جديد</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="productForm" enctype="multipart/form-data">
+                        <input type="hidden" id="productId">
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productTitle">اسم المنتج *</label>
+                                <input type="text" id="productTitle" required 
+                                       placeholder="أدخل اسم المنتج">
+                                <span class="error-message" id="titleError"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="productCategory">التصنيف *</label>
+                                <select id="productCategory" required>
+                                    <option value="">جاري تحميل التصنيفات...</option>
+                                </select>
+                                <span class="error-message" id="categoryError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productDescription">وصف المنتج</label>
+                            <textarea id="productDescription" rows="3" 
+                                     placeholder="أدخل وصف المنتج (اختياري)"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="purchasePrice">سعر الشراء *</label>
+                                <input type="number" id="purchasePrice" required 
+                                       min="0" step="0.01" placeholder="0.00">
+                                <span class="error-message" id="purchasePriceError"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sellingPrice">سعر البيع *</label>
+                                <input type="number" id="sellingPrice" required 
+                                       min="0" step="0.01" placeholder="0.00">
+                                <span class="error-message" id="sellingPriceError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="discountPercentage">نسبة الخصم %</label>
+                                <input type="number" id="discountPercentage" 
+                                       min="0" max="100" step="1" placeholder="0">
+                                <span class="help-text">من 0 إلى 100</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="productQuantity">الكمية المتاحة *</label>
+                                <input type="number" id="productQuantity" required 
+                                       min="0" placeholder="0">
+                                <span class="error-message" id="quantityError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productColor">اللون</label>
+                                <input type="text" id="productColor" 
+                                       placeholder="أدخل لون المنتج">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="productVerified">حالة المنتج</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="productVerified">
+                                    <label for="productVerified" class="checkbox-label">
+                                        <i class="fas fa-check"></i> منتج موثوق
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productImages">صور المنتج</label>
+                            <div class="file-upload-multiple">
+                                <input type="file" id="productImages" 
+                                       accept="image/*" multiple class="file-input">
+                                <div class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>اختر صور المنتج (يمكن اختيار أكثر من صورة)</span>
+                                </div>
+                            </div>
+                            <div id="imagesPreview" class="images-preview"></div>
+                            <span class="error-message" id="imagesError"></span>
+                        </div>
+
+                        <div class="price-summary">
+                            <div class="summary-item">
+                                <span>سعر البيع:</span>
+                                <span id="summarySellingPrice">0.00</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>الخصم:</span>
+                                <span id="summaryDiscount">0.00</span>
+                            </div>
+                            <div class="summary-item total">
+                                <span>السعر النهائي:</span>
+                                <span id="summaryFinalPrice">0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-plus"></i> إضافة منتج
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()" id="cancelBtn" style="display: none;">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Products List -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> قائمة المنتجات</h3>
+                    <div class="card-actions">
+                        <div class="view-controls">
+                            <button class="btn btn-view active" data-view="grid" onclick="changeView('grid')">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="btn btn-view" data-view="list" onclick="changeView('list')">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-refresh" onclick="loadProducts()">
+                            <i class="fas fa-sync-alt"></i> تحديث
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Filters -->
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label for="categoryFilter">التصنيف:</label>
+                            <select id="categoryFilter" onchange="filterProducts()">
+                                <option value="">جميع التصنيفات</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="sortFilter">ترتيب حسب:</label>
+                            <select id="sortFilter" onchange="filterProducts()">
+                                <option value="newest">الأحدث</option>
+                                <option value="views">الأكثر مشاهدة</option>
+                                <option value="searches">الأكثر بحثاً</option>
+                                <option value="price-low">السعر (منخفض إلى مرتفع)</option>
+                                <option value="price-high">السعر (مرتفع إلى منخفض)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="searchFilter">بحث:</label>
+                            <input type="text" id="searchFilter" placeholder="ابحث في المنتجات..." oninput="filterProducts()">
+                        </div>
+                    </div>
+
+                    <!-- Products Grid View -->
+                    <div id="gridView" class="products-grid">
+                        <!-- Products will be loaded here -->
+                    </div>
+
+                    <!-- Products List View -->
+                    <div id="listView" class="products-list" style="display: none;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الصور</th>
+                                    <th>اسم المنتج</th>
+                                    <th>التصنيف</th>
+                                    <th>الأسعار</th>
+                                    <th>الكمية</th>
+                                    <th>المشاهدات</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <!-- Products will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination">
+                        <!-- Pagination will be loaded here -->
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="loadingState" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>جاري تحميل المنتجات...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <i class="fas fa-box-open"></i>
+                        <h3>لا توجد منتجات</h3>
+                        <p>لم يتم إضافة أي منتجات بعد. ابدأ بإضافة منتج جديد.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> تأكيد الحذف</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من أنك تريد حذف هذا المنتج؟</p>
+                <p class="text-warning">هذا الإجراء لا يمكن التراجع عنه!</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> نعم، احذف
+                </button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> تفاصيل المنتج</h3>
+                <button class="modal-close" onclick="closeDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="productDetailsContent">
+                    <!-- Product details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDetailsModal()">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+</body>
+</html>
