@@ -1,74 +1,6 @@
 // تكوين API
-const DEVELOPMENT_MODE = true;
-const API_BASE_URL = DEVELOPMENT_MODE 
-    ? 'https://jsonplaceholder.typicode.com'
-    : 'https://api-spring.bigzero.online/api/v1/products';
-
+const API_BASE_URL = 'https://api-spring.bigzero.online/api/v1/products';
 const CATEGORIES_API_URL = 'https://api-spring.bigzero.online/api/v1/categories';
-
-// بيانات تجريبية
-const mockProducts = [
-    {
-        id: 1,
-        title: "سامسونج جالاكسي S23",
-        description: "هاتف ذكي بمواصفات عالية وكاميرا متطورة",
-        purchasPrice: 1800,
-        sellingPrice: 2200,
-        discountPercentage: 10,
-        quantity: 50,
-        color: "أسود",
-        categoryId: 1,
-        viewsCounter: 1500,
-        searchCounter: 300,
-        images: [
-            "https://via.placeholder.com/400x300/667eea/white?text=Galaxy+S23",
-            "https://via.placeholder.com/400x300/764ba2/white?text=Back+View"
-        ],
-        isVerified: true
-    },
-    {
-        id: 2,
-        title: "آيفون 14 برو",
-        description: "أحدث إصدار من آيفون بشريحة A16 بايونيك",
-        purchasPrice: 3000,
-        sellingPrice: 3500,
-        discountPercentage: 5,
-        quantity: 25,
-        color: "فضي",
-        categoryId: 2,
-        viewsCounter: 2000,
-        searchCounter: 450,
-        images: [
-            "https://via.placeholder.com/400x300/28a745/white?text=iPhone+14+Pro"
-        ],
-        isVerified: true
-    },
-    {
-        id: 3,
-        title: "لابتوب ديل XPS 13",
-        description: "لابتوب متنقل بشاشة لامعة ومعالج قوي",
-        purchasPrice: 4000,
-        sellingPrice: 4800,
-        discountPercentage: 15,
-        quantity: 15,
-        color: "أبيض",
-        categoryId: 4,
-        viewsCounter: 800,
-        searchCounter: 120,
-        images: [
-            "https://via.placeholder.com/400x300/dc3545/white?text=Dell+XPS+13"
-        ],
-        isVerified: false
-    }
-];
-
-const mockCategories = [
-    { id: 1, nameAr: "هواتف سامسونج", nameEn: "Samsung Phones" },
-    { id: 2, nameAr: "هواتف آيفون", nameEn: "iPhone" },
-    { id: 3, nameAr: "هواتف شاومي", nameEn: "Xiaomi Phones" },
-    { id: 4, nameAr: "لابتوبات", nameEn: "Laptops" },
-    { id: 5, nameAr: "تابلت", nameEn: "Tablets" }
-];
 
 // المتغيرات العامة
 let products = [];
@@ -92,11 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // التحقق من المصادقة
 function checkAuth() {
-    if (DEVELOPMENT_MODE) {
-        console.log('وضع التطوير مفعل - تخطي التحقق من المصادقة');
-        return;
-    }
-    
     const token = localStorage.getItem('accessToken');
     if (!token) {
         window.location.href = 'index.html';
@@ -143,12 +70,6 @@ async function loadCategories() {
     const categorySelect = document.getElementById('productCategory');
     const filterSelect = document.getElementById('categoryFilter');
     
-    if (DEVELOPMENT_MODE) {
-        categories = mockCategories;
-        updateCategorySelects();
-        return;
-    }
-    
     try {
         const token = localStorage.getItem('accessToken');
         const response = await fetch(CATEGORIES_API_URL, {
@@ -161,15 +82,17 @@ async function loadCategories() {
             throw new Error('فشل في تحميل التصنيفات');
         }
 
-        categories = await response.json();
+        const data = await response.json();
+        // استخراج التصنيفات من الاستجابة
+        categories = data.content || data || [];
         updateCategorySelects();
         
     } catch (error) {
         console.error('Error loading categories:', error);
-        if (DEVELOPMENT_MODE) {
-            categories = mockCategories;
-            updateCategorySelects();
-        }
+        showAlert('فشل في تحميل التصنيفات', 'error');
+        // تعيين مصفوفة فارغة في حالة الخطأ
+        categories = [];
+        updateCategorySelects();
     }
 }
 
@@ -181,32 +104,45 @@ function updateCategorySelects() {
     categorySelect.innerHTML = '<option value="">اختر التصنيف...</option>';
     filterSelect.innerHTML = '<option value="">جميع التصنيفات</option>';
     
-    categories.forEach(category => {
-        const option1 = document.createElement('option');
-        option1.value = category.id;
-        option1.textContent = category.nameAr;
-        categorySelect.appendChild(option1);
-        
-        const option2 = document.createElement('option');
-        option2.value = category.id;
-        option2.textContent = category.nameAr;
-        filterSelect.appendChild(option2);
-    });
+    if (categories.length === 0) {
+        const noCategoryOption = document.createElement('option');
+        noCategoryOption.value = "";
+        noCategoryOption.textContent = "لا توجد تصنيفات";
+        noCategoryOption.disabled = true;
+        categorySelect.appendChild(noCategoryOption);
+        return;
+    }
+    
+    // دالة مساعدة لمعالجة التصنيفات المتداخلة
+    function processCategories(categoryList, level = 0) {
+        categoryList.forEach(category => {
+            const prefix = '─ '.repeat(level);
+            const categoryName = category.nameAr || category.nameEn || `التصنيف ${category.id}`;
+            
+            const option1 = document.createElement('option');
+            option1.value = category.id;
+            option1.textContent = prefix + categoryName;
+            categorySelect.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = category.id;
+            option2.textContent = prefix + categoryName;
+            filterSelect.appendChild(option2);
+            
+            // معالجة التصنيفات الفرعية بشكل متكرر
+            if (category.children && category.children.length > 0) {
+                processCategories(category.children, level + 1);
+            }
+        });
+    }
+    
+    processCategories(categories);
 }
 
 // تحميل المنتجات
 async function loadProducts(page = 0) {
     showLoadingState();
     currentPage = page;
-    
-    if (DEVELOPMENT_MODE) {
-        setTimeout(() => {
-            products = mockProducts;
-            displayProducts();
-            updatePagination();
-        }, 1000);
-        return;
-    }
     
     try {
         const token = localStorage.getItem('accessToken');
@@ -229,13 +165,8 @@ async function loadProducts(page = 0) {
         
     } catch (error) {
         console.error('Error loading products:', error);
-        if (DEVELOPMENT_MODE) {
-            products = mockProducts;
-            displayProducts();
-            updatePagination();
-        } else {
-            showEmptyState();
-        }
+        showAlert('فشل في تحميل المنتجات', 'error');
+        showEmptyState();
     }
 }
 
@@ -272,7 +203,7 @@ function displayGridView(productsToDisplay) {
     const gridView = document.getElementById('gridView');
     
     gridView.innerHTML = productsToDisplay.map(product => {
-        const category = categories.find(c => c.id === product.categoryId);
+        const category = findCategoryById(product.categoryId);
         const finalPrice = calculateFinalPrice(product.sellingPrice, product.discountPercentage);
         const hasDiscount = product.discountPercentage > 0;
         
@@ -288,12 +219,12 @@ function displayGridView(productsToDisplay) {
                 </div>
                 <div class="product-content">
                     <h3 class="product-title">${product.title}</h3>
-                    <div class="product-category">${category ? category.nameAr : 'غير مصنف'}</div>
+                    <div class="product-category">${getCategoryName(category)}</div>
                     
                     <div class="product-prices">
-                        <span class="product-price">${finalPrice.toFixed(2)} ر.س</span>
+                        <span class="product-price">${finalPrice.toFixed(2)} جنية</span>
                         ${hasDiscount ? `
-                            <span class="product-price original">${product.sellingPrice} ر.س</span>
+                            <span class="product-price original">${product.sellingPrice} جنية</span>
                         ` : ''}
                     </div>
                     
@@ -331,7 +262,7 @@ function displayListView(productsToDisplay) {
     const tableBody = document.getElementById('productsTableBody');
     
     tableBody.innerHTML = productsToDisplay.map(product => {
-        const category = categories.find(c => c.id === product.categoryId);
+        const category = findCategoryById(product.categoryId);
         const finalPrice = calculateFinalPrice(product.sellingPrice, product.discountPercentage);
         const hasDiscount = product.discountPercentage > 0;
         
@@ -351,13 +282,13 @@ function displayListView(productsToDisplay) {
                     <strong>${product.title}</strong>
                     ${product.isVerified ? '<br><small class="text-success"><i class="fas fa-check"></i> موثوق</small>' : ''}
                 </td>
-                <td>${category ? category.nameAr : 'غير مصنف'}</td>
+                <td>${getCategoryName(category)}</td>
                 <td>
                     <div>
-                        <strong>${finalPrice.toFixed(2)} ر.س</strong>
+                        <strong>${finalPrice.toFixed(2)} جنية</strong>
                         ${hasDiscount ? `
                             <br>
-                            <small class="text-muted" style="text-decoration: line-through;">${product.sellingPrice} ر.س</small>
+                            <small class="text-muted" style="text-decoration: line-through;">${product.sellingPrice} جنية</small>
                             <span class="product-discount">${product.discountPercentage}%</span>
                         ` : ''}
                     </div>
@@ -395,6 +326,30 @@ function displayListView(productsToDisplay) {
     }).join('');
 }
 
+// البحث عن التصنيف بالمعرف
+function findCategoryById(categoryId) {
+    function searchInCategories(categoryList) {
+        for (const category of categoryList) {
+            if (category.id === categoryId) {
+                return category;
+            }
+            if (category.children && category.children.length > 0) {
+                const found = searchInCategories(category.children);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+    
+    return searchInCategories(categories);
+}
+
+// الحصول على اسم التصنيف
+function getCategoryName(category) {
+    if (!category) return 'غير مصنف';
+    return category.nameAr || category.nameEn || `التصنيف ${category.id}`;
+}
+
 // حساب السعر النهائي
 function calculateFinalPrice(sellingPrice, discountPercentage) {
     const discount = discountPercentage || 0;
@@ -416,7 +371,7 @@ function filterProductsList(productsList) {
         const matchesCategory = !categoryFilter || product.categoryId == categoryFilter;
         const matchesSearch = !searchFilter || 
                              product.title.toLowerCase().includes(searchFilter) ||
-                             product.description.toLowerCase().includes(searchFilter);
+                             (product.description && product.description.toLowerCase().includes(searchFilter));
         
         return matchesCategory && matchesSearch;
     });
@@ -569,53 +524,6 @@ async function handleProductSubmit(event) {
         return;
     }
     
-    // في وضع التطوير، محاكاة الحفظ
-    if (DEVELOPMENT_MODE) {
-        const submitBtn = document.getElementById('submitBtn');
-        const originalText = submitBtn.innerHTML;
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
-
-        setTimeout(() => {
-            const productData = {
-                id: isEditMode ? parseInt(document.getElementById('productId').value) : Date.now(),
-                title: document.getElementById('productTitle').value,
-                description: document.getElementById('productDescription').value,
-                purchasPrice: parseFloat(document.getElementById('purchasePrice').value),
-                sellingPrice: parseFloat(document.getElementById('sellingPrice').value),
-                discountPercentage: parseInt(document.getElementById('discountPercentage').value) || 0,
-                quantity: parseInt(document.getElementById('productQuantity').value),
-                color: document.getElementById('productColor').value,
-                categoryId: parseInt(document.getElementById('productCategory').value),
-                viewsCounter: 0,
-                searchCounter: 0,
-                images: ["https://via.placeholder.com/400x300/667eea/white?text=Product+Image"],
-                isVerified: document.getElementById('productVerified').checked
-            };
-
-            if (isEditMode) {
-                const index = mockProducts.findIndex(p => p.id === productData.id);
-                if (index !== -1) {
-                    mockProducts[index] = { ...mockProducts[index], ...productData };
-                }
-                showAlert('تم تحديث المنتج بنجاح! 🎉 (وضع تجريبي)', 'success');
-            } else {
-                mockProducts.push(productData);
-                showAlert('تم إضافة المنتج بنجاح! 🎉 (وضع تجريبي)', 'success');
-            }
-
-            resetForm();
-            loadProducts(currentPage);
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        }, 1500);
-        
-        return;
-    }
-    
-    // الكود الأصلي للاتصال بالخادم الحقيقي...
     const formData = new FormData();
     const productDto = {
         title: document.getElementById('productTitle').value,
@@ -790,7 +698,7 @@ function showProductDetails(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const category = categories.find(c => c.id === product.categoryId);
+    const category = findCategoryById(product.categoryId);
     const finalPrice = calculateFinalPrice(product.sellingPrice, product.discountPercentage);
     
     const content = document.getElementById('productDetailsContent');
@@ -819,7 +727,7 @@ function showProductDetails(productId) {
                 <div class="details-meta">
                     <div class="meta-item">
                         <span class="meta-label">التصنيف:</span>
-                        <span class="meta-value">${category ? category.nameAr : 'غير مصنف'}</span>
+                        <span class="meta-value">${getCategoryName(category)}</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">اللون:</span>
@@ -827,11 +735,11 @@ function showProductDetails(productId) {
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">سعر الشراء:</span>
-                        <span class="meta-value">${product.purchasPrice} ر.س</span>
+                        <span class="meta-value">${product.purchasPrice} جنية</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">سعر البيع:</span>
-                        <span class="meta-value">${product.sellingPrice} ر.س</span>
+                        <span class="meta-value">${product.sellingPrice} جنية</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">نسبة الخصم:</span>
@@ -839,7 +747,7 @@ function showProductDetails(productId) {
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">السعر النهائي:</span>
-                        <span class="meta-value" style="color: #28a745; font-weight: bold;">${finalPrice.toFixed(2)} ر.س</span>
+                        <span class="meta-value" style="color: #28a745; font-weight: bold;">${finalPrice.toFixed(2)} جنية</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">الكمية المتاحة:</span>
@@ -897,17 +805,6 @@ function closeDeleteModal() {
 // تأكيد الحذف
 async function confirmDelete() {
     if (!productToDelete) return;
-
-    if (DEVELOPMENT_MODE) {
-        const index = mockProducts.findIndex(p => p.id === productToDelete);
-        if (index !== -1) {
-            mockProducts.splice(index, 1);
-            showAlert('تم حذف المنتج بنجاح! (وضع تجريبي)', 'success');
-            closeDeleteModal();
-            loadProducts(currentPage);
-        }
-        return;
-    }
 
     try {
         const token = localStorage.getItem('accessToken');
