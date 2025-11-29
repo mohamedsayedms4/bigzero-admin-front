@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الموردين والفواتير</title>
+    <link rel="stylesheet" href="supplier.css">
+</head>
+<body>
+    <div class="container">
+        <!-- قسم تسجيل الدخول -->
+        <div id="loginSection" class="login-section">
+            <div class="login-box">
+                <h2>تسجيل الدخول</h2>
+                <p>يرجى إدخال التوكن للمصادقة</p>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>التوكن (JWT Token)</label>
+                        <input type="text" id="authTokenInput" placeholder="أدخل التوكن هنا" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">دخول</button>
+                </form>
+                <p class="login-note">يمكنك الحصول على التوكن من نظام تسجيل الدخول الخاص بك</p>
+            </div>
+        </div>
+
+        <!-- القسم الرئيسي -->
+        <div id="mainSection" style="display: none;">
+        <header>
+            <div class="header-content">
+                <h1>نظام إدارة الموردين والفواتير</h1>
+                <button class="btn btn-logout" id="logoutBtn">تسجيل الخروج</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="suppliers">الموردين</button>
+            <button class="tab-btn" data-tab="invoices">الفواتير</button>
+        </nav>
+
+        <!-- قسم الموردين -->
+        <div id="suppliers-section" class="tab-content active">
+            <div class="section-header">
+                <h2>قائمة الموردين</h2>
+                <button class="btn btn-primary" id="addSupplierBtn">إضافة مورد جديد</button>
+            </div>
+
+            <div class="table-container">
+                <table id="suppliersTable">
+                    <thead>
+                        <tr>
+                            <th>الرقم</th>
+                            <th>الاسم</th>
+                            <th>الهاتف</th>
+                            <th>إجمالي المدفوع</th>
+                            <th>إجمالي المسحوب</th>
+                            <th>المتبقي</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- قسم الفواتير -->
+        <div id="invoices-section" class="tab-content">
+            <div class="section-header">
+                <h2>قائمة الفواتير</h2>
+                <button class="btn btn-primary" id="addInvoiceBtn">إضافة فاتورة جديدة</button>
+            </div>
+
+            <div class="filters">
+                <label>تصفية حسب المورد:</label>
+                <select id="supplierFilter">
+                    <option value="">جميع الموردين</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table id="invoicesTable">
+                    <thead>
+                        <tr>
+                            <th>رقم الفاتورة</th>
+                            <th>المورد</th>
+                            <th>التاريخ</th>
+                            <th>الإجمالي</th>
+                            <th>المدفوع</th>
+                            <th>المتبقي</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال المورد -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="supplierModalTitle">إضافة مورد جديد</h2>
+            <form id="supplierForm">
+                <input type="hidden" id="supplierId">
+                
+                <div class="form-group">
+                    <label>اسم المورد *</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>رقم الهاتف *</label>
+                    <input type="text" id="supplierPhone" required>
+                </div>
+
+                <div class="form-group">
+                    <label>رابط التلجرام</label>
+                    <input type="text" id="supplierTelegram">
+                </div>
+
+                <div class="form-group">
+                    <label>رابط الواتساب</label>
+                    <input type="text" id="supplierWhatsapp">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>إجمالي المدفوع</label>
+                        <input type="number" id="supplierPaid" value="0" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>إجمالي المسحوب</label>
+                        <input type="number" id="supplierWithdraw" value="0" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>المتبقي</label>
+                        <input type="number" id="supplierDue" value="0" step="0.01">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeSupplierModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال الفاتورة -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close">&times;</span>
+            <h2 id="invoiceModalTitle">إضافة فاتورة جديدة</h2>
+            <form id="invoiceForm">
+                <input type="hidden" id="invoiceId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>المورد *</label>
+                        <select id="invoiceSupplier" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تاريخ الفاتورة *</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ملاحظات</label>
+                    <textarea id="invoiceNotes" rows="3"></textarea>
+                </div>
+
+                <h3>المنتجات</h3>
+                <div class="items-section">
+                    <div id="invoiceItems"></div>
+                    <button type="button" class="btn btn-secondary" id="addItemBtn">إضافة منتج</button>
+                </div>
+
+                <div class="invoice-summary">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الإجمالي الكلي</label>
+                            <input type="number" id="invoiceTotal" readonly step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label>المبلغ المدفوع</label>
+                            <input type="number" id="invoicePaid" step="0.01" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>المتبقي</label>
+                            <input type="number" id="invoiceRemaining" readonly step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">حفظ الفاتورة</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeInvoiceModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="supplier.js"></script>
+</body>
+</html>
