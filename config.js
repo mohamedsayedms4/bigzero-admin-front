@@ -1,6 +1,6 @@
 // ملف الإعدادات - غير الـ API URL حسب السيرفر الخاص بك
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8080',
+    BASE_URL: 'https://api-spring.bigzero.online',
     ENDPOINTS: {
         SUPPLIERS: '/api/suppliers',
         INVOICES: '/api/invoices',
