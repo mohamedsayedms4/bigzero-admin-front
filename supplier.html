@@ -4,28 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة الموردين والفواتير</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="supplier.css">
 </head>
 <body>
     <div class="container">
-        <!-- قسم تسجيل الدخول -->
-        <div id="loginSection" class="login-section">
-            <div class="login-box">
-                <h2>تسجيل الدخول</h2>
-                <p>يرجى إدخال التوكن للمصادقة</p>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label>التوكن (JWT Token)</label>
-                        <input type="text" id="authTokenInput" placeholder="أدخل التوكن هنا" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">دخول</button>
-                </form>
-                <p class="login-note">يمكنك الحصول على التوكن من نظام تسجيل الدخول الخاص بك</p>
-            </div>
-        </div>
-
-        <!-- القسم الرئيسي -->
-        <div id="mainSection" style="display: none;">
         <header>
             <div class="header-content">
                 <h1>نظام إدارة الموردين والفواتير</h1>
@@ -45,22 +28,19 @@
                 <button class="btn btn-primary" id="addSupplierBtn">إضافة مورد جديد</button>
             </div>
 
-            <div class="table-container">
-                <table id="suppliersTable">
-                    <thead>
-                        <tr>
-                            <th>الرقم</th>
-                            <th>الاسم</th>
-                            <th>الهاتف</th>
-                            <th>إجمالي المدفوع</th>
-                            <th>إجمالي المسحوب</th>
-                            <th>المتبقي</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="suppliers-grid" id="suppliersGrid">
+                <!-- سيتم إضافة بطاقات الموردين هنا -->
             </div>
+        </div>
+
+        <!-- صفحة تفاصيل المورد -->
+        <div id="supplier-details-section" class="tab-content">
+            <div class="details-header">
+                <button class="btn btn-secondary" id="backToSuppliersBtn">
+                    <i class="fas fa-arrow-right"></i> رجوع للموردين
+                </button>
+            </div>
+            <div id="supplierDetailsContent"></div>
         </div>
 
         <!-- قسم الفواتير -->
@@ -116,12 +96,12 @@
 
                 <div class="form-group">
                     <label>رابط التلجرام</label>
-                    <input type="text" id="supplierTelegram">
+                    <input type="text" id="supplierTelegram" placeholder="https://t.me/username">
                 </div>
 
                 <div class="form-group">
                     <label>رابط الواتساب</label>
-                    <input type="text" id="supplierWhatsapp">
+                    <input type="text" id="supplierWhatsapp" placeholder="https://wa.me/201234567890">
                 </div>
 
                 <div class="form-row">
@@ -205,7 +185,6 @@
                 </div>
             </form>
         </div>
-    </div>
     </div>
 
     <script src="config.js"></script>

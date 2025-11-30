@@ -7,41 +7,8 @@ let itemCounter = 0;
 
 // تهيئة التطبيق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuthAndInitialize();
+    initializeApp();
 });
-
-// التحقق من المصادقة وتهيئة التطبيق
-function checkAuthAndInitialize() {
-    const token = localStorage.getItem('accessToken');
-    
-    if (token) {
-        // إذا كان التوكن موجود، اعرض القسم الرئيسي
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('mainSection').style.display = 'block';
-        initializeApp();
-    } else {
-        // إذا لم يكن موجود، اعرض صفحة تسجيل الدخول
-        document.getElementById('loginSection').style.display = 'flex';
-        document.getElementById('mainSection').style.display = 'none';
-        setupLoginForm();
-    }
-}
-
-// إعداد نموذج تسجيل الدخول
-function setupLoginForm() {
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const token = document.getElementById('authTokenInput').value.trim();
-        
-        if (token) {
-            localStorage.setItem('accessToken', token);
-            checkAuthAndInitialize();
-            showAlert('تم تسجيل الدخول بنجاح');
-        } else {
-            showAlert('يرجى إدخال التوكن', 'error');
-        }
-    });
-}
 
 async function initializeApp() {
     setupEventListeners();
@@ -63,6 +30,12 @@ function setupEventListeners() {
     // التبويبات
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // زر الرجوع من تفاصيل المورد
+    document.getElementById('backToSuppliersBtn').addEventListener('click', () => {
+        document.getElementById('supplier-details-section').classList.remove('active');
+        document.getElementById('suppliers-section').classList.add('active');
     });
 
     // أزرار إضافة
@@ -120,24 +93,171 @@ async function loadSuppliers() {
 }
 
 function displaySuppliers() {
-    const tbody = document.querySelector('#suppliersTable tbody');
-    tbody.innerHTML = '';
+    const grid = document.getElementById('suppliersGrid');
+    grid.innerHTML = '';
 
     suppliers.forEach(supplier => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${supplier.id}</td>
-            <td>${supplier.name}</td>
-            <td>${supplier.phone}</td>
-            <td>${formatHelper.currency(supplier.totalPaid)}</td>
-            <td>${formatHelper.currency(supplier.totalWithdraw)}</td>
-            <td>${formatHelper.currency(supplier.totalDue)}</td>
-            <td>
-                <button class="btn btn-edit" onclick="editSupplier(${supplier.id})">تعديل</button>
-                <button class="btn btn-delete" onclick="deleteSupplier(${supplier.id})">حذف</button>
-            </td>
+        const card = document.createElement('div');
+        card.className = 'supplier-card-simple';
+        card.onclick = () => viewSupplierDetails(supplier.id);
+        
+        card.innerHTML = `
+            <div class="supplier-name">
+                <i class="fas fa-user-tie"></i>
+                <h3>${supplier.name}</h3>
+            </div>
+            <div class="supplier-arrow">
+                <i class="fas fa-chevron-left"></i>
+            </div>
         `;
+        
+        grid.appendChild(card);
     });
+}
+
+function viewSupplierDetails(id) {
+    const supplier = suppliers.find(s => s.id === id);
+    if (!supplier) return;
+    
+    const detailsContent = document.getElementById('supplierDetailsContent');
+    
+    detailsContent.innerHTML = `
+        <div class="supplier-details-page">
+            <div class="supplier-header">
+                <h1>${supplier.name}</h1>
+                <span class="supplier-id-badge">#${supplier.id}</span>
+            </div>
+            
+            <div class="details-cards">
+                <!-- بطاقة معلومات الاتصال -->
+                <div class="detail-card">
+                    <h3><i class="fas fa-address-card"></i> معلومات الاتصال</h3>
+                    <div class="card-content">
+                        <div class="info-row">
+                            <span class="info-label">رقم الهاتف:</span>
+                            <a href="tel:${supplier.phone}" class="info-value phone-link">
+                                <i class="fas fa-phone"></i> ${supplier.phone}
+                            </a>
+                        </div>
+                        
+                        ${supplier.whatsappLink || supplier.telegramLink ? `
+                            <div class="info-row">
+                                <span class="info-label">التواصل الاجتماعي:</span>
+                                <div class="social-links">
+                                    ${supplier.whatsappLink ? `
+                                        <a href="${supplier.whatsappLink}" target="_blank" class="social-btn whatsapp">
+                                            <i class="fab fa-whatsapp"></i> واتساب
+                                        </a>
+                                    ` : ''}
+                                    ${supplier.telegramLink ? `
+                                        <a href="${supplier.telegramLink}" target="_blank" class="social-btn telegram">
+                                            <i class="fab fa-telegram"></i> تليجرام
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <!-- بطاقة المعلومات المالية -->
+                <div class="detail-card">
+                    <h3><i class="fas fa-money-bill-wave"></i> المعلومات المالية</h3>
+                    <div class="card-content">
+                        <div class="financial-grid">
+                            <div class="financial-box paid">
+                                <div class="financial-icon">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <div class="financial-info">
+                                    <span class="financial-label">إجمالي المدفوع</span>
+                                    <span class="financial-amount">${formatHelper.currency(supplier.totalPaid)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="financial-box withdraw">
+                                <div class="financial-icon">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <div class="financial-info">
+                                    <span class="financial-label">إجمالي المسحوب</span>
+                                    <span class="financial-amount">${formatHelper.currency(supplier.totalWithdraw)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="financial-box due">
+                                <div class="financial-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="financial-info">
+                                    <span class="financial-label">المتبقي</span>
+                                    <span class="financial-amount">${formatHelper.currency(supplier.totalDue)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- أزرار الإجراءات -->
+            <div class="action-buttons">
+                <button class="btn btn-large btn-invoices" onclick="showSupplierInvoices(${supplier.id})">
+                    <i class="fas fa-file-invoice"></i> عرض الفواتير
+                </button>
+                <button class="btn btn-large btn-edit" onclick="editSupplier(${supplier.id})">
+                    <i class="fas fa-edit"></i> تعديل البيانات
+                </button>
+                <button class="btn btn-large btn-delete" onclick="deleteSupplier(${supplier.id})">
+                    <i class="fas fa-trash"></i> حذف المورد
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // الانتقال لصفحة التفاصيل
+    document.getElementById('suppliers-section').classList.remove('active');
+    document.getElementById('supplier-details-section').classList.add('active');
+    
+    // التمرير للأعلى
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showSupplierInvoices(supplierId) {
+    // الرجوع لقائمة الموردين أولاً
+    document.getElementById('supplier-details-section').classList.remove('active');
+    document.getElementById('suppliers-section').classList.remove('active');
+    
+    // التبديل لتبويب الفواتير
+    switchTab('invoices');
+    
+    // تعيين الفلتر للمورد
+    document.getElementById('supplierFilter').value = supplierId;
+    
+    // تطبيق الفلتر
+    filterInvoicesBySupplier();
+    
+    // التمرير للأعلى
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showCustomModal(content) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            ${content}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close').onclick = () => modal.remove();
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
 }
 
 function openSupplierModal(supplier = null) {
@@ -190,11 +310,9 @@ async function handleSupplierSubmit(e) {
         const supplierId = supplierIdInput && supplierIdInput !== '' ? parseInt(supplierIdInput) : null;
         
         if (supplierId) {
-            // تحديث مورد موجود
             await supplierAPI.update(supplierId, supplierData);
             showAlert('تم تحديث المورد بنجاح');
         } else {
-            // إنشاء مورد جديد
             await supplierAPI.create(supplierData);
             showAlert('تم إضافة المورد بنجاح');
         }
@@ -306,7 +424,6 @@ function openInvoiceModal(invoice = null) {
         document.getElementById('invoicePaid').value = invoice.paidAmount;
         document.getElementById('invoiceRemaining').value = invoice.remainingAmount;
         
-        // تحميل المنتجات
         document.getElementById('invoiceItems').innerHTML = '';
         itemCounter = 0;
         if (invoice.items && invoice.items.length > 0) {
@@ -417,7 +534,6 @@ async function searchProduct(itemId) {
             </div>
         `;
         
-        // تعيين سعر الوحدة تلقائياً
         const priceInput = itemDiv.querySelector('.item-price');
         if (priceInput.value == 0 || !priceInput.value) {
             priceInput.value = product.purchasPrice;

@@ -53,46 +53,6 @@ header h1 {
     color: #667eea;
 }
 
-/* صفحة تسجيل الدخول */
-.login-section {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.login-box {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    max-width: 450px;
-    width: 100%;
-    text-align: center;
-}
-
-.login-box h2 {
-    color: #667eea;
-    margin-bottom: 10px;
-    font-size: 2em;
-}
-
-.login-box p {
-    color: #6c757d;
-    margin-bottom: 30px;
-}
-
-.login-note {
-    margin-top: 20px;
-    font-size: 0.9em;
-    color: #999;
-}
-
-.btn-block {
-    width: 100%;
-}
-
 /* التبويبات */
 .tabs {
     display: flex;
@@ -200,6 +160,297 @@ header h1 {
     color: white;
     padding: 8px 16px;
     margin: 0 5px;
+}
+
+.btn-invoices {
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    margin: 0 5px;
+    flex: 1;
+}
+
+.btn-invoices:hover {
+    background: #218838;
+}
+
+/* بطاقات الموردين البسيطة */
+.suppliers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.supplier-card-simple {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.supplier-card-simple:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    border-color: #667eea;
+}
+
+.supplier-name {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.supplier-name i {
+    font-size: 2em;
+    color: #667eea;
+}
+
+.supplier-name h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.supplier-arrow {
+    color: #667eea;
+    font-size: 1.2em;
+    transition: transform 0.3s;
+}
+
+.supplier-card-simple:hover .supplier-arrow {
+    transform: translateX(-5px);
+}
+
+/* صفحة تفاصيل المورد */
+.details-header {
+    margin-bottom: 30px;
+}
+
+.details-header .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.supplier-details-page {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.supplier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #667eea;
+}
+
+.supplier-header h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin: 0;
+}
+
+.supplier-id-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.details-cards {
+    display: grid;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-right: 5px solid #667eea;
+}
+
+.detail-card h3 {
+    color: #667eea;
+    font-size: 1.5em;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-content {
+    padding: 10px 0;
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.95em;
+}
+
+.info-value {
+    color: #333;
+    font-size: 1.1em;
+}
+
+.phone-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.phone-link:hover {
+    color: #764ba2;
+    transform: translateX(-3px);
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.social-btn.whatsapp {
+    background: #25D366;
+}
+
+.social-btn.whatsapp:hover {
+    background: #20ba5a;
+}
+
+.social-btn.telegram {
+    background: #0088cc;
+}
+
+.social-btn.telegram:hover {
+    background: #006699;
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.financial-box {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-right: 5px solid;
+}
+
+.financial-box.paid {
+    border-color: #28a745;
+}
+
+.financial-box.withdraw {
+    border-color: #ffc107;
+}
+
+.financial-box.due {
+    border-color: #dc3545;
+}
+
+.financial-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: white;
+}
+
+.financial-box.paid .financial-icon {
+    background: #28a745;
+}
+
+.financial-box.withdraw .financial-icon {
+    background: #ffc107;
+}
+
+.financial-box.due .financial-icon {
+    background: #dc3545;
+}
+
+.financial-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.financial-label {
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.financial-amount {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #333;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-large {
+    flex: 1;
+    min-width: 200px;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 /* الجداول */
@@ -467,12 +718,53 @@ tbody tr:hover {
 /* تصميم متجاوب */
 @media (max-width: 768px) {
     header h1 {
-        font-size: 1.8em;
+        font-size: 1.5em;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
     }
 
     .section-header {
         flex-direction: column;
         gap: 15px;
+    }
+
+    .suppliers-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .supplier-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .supplier-header h1 {
+        font-size: 1.8em;
+    }
+
+    .financial-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-large {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .social-links {
+        flex-direction: column;
+    }
+
+    .social-btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .form-row {
@@ -485,7 +777,7 @@ tbody tr:hover {
     }
 
     table {
-        font-size: 0.9em;
+        font-size: 0.85em;
     }
 
     th, td {
