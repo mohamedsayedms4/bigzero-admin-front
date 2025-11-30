@@ -11,21 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeApp() {
-    setupEventListeners();
+    // setupEventListeners();
     await loadSuppliers();
     await loadInvoices();
 }
 
 // إعداد Event Listeners
-function setupEventListeners() {
-    // تسجيل الخروج
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        if (confirm('هل تريد تسجيل الخروج؟')) {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            location.reload();
-        }
-    });
+// function setupEventListeners() {
+//     // تسجيل الخروج
+//     document.getElementById('logoutBtn').addEventListener('click', function() {
+//         if (confirm('هل تريد تسجيل الخروج؟')) {
+//             localStorage.removeItem('accessToken');
+//             localStorage.removeItem('refreshToken');
+//             location.reload();
+//         }
+//     });
 
     // التبويبات
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -68,7 +68,7 @@ function setupEventListeners() {
 
     // حساب المتبقي عند تغيير المبلغ المدفوع
     document.getElementById('invoicePaid').addEventListener('input', calculateInvoiceRemaining);
-}
+
 
 // التبديل بين التبويبات
 function switchTab(tabName) {
@@ -680,4 +680,8 @@ function filterInvoicesBySupplier() {
     
     const filtered = invoices.filter(inv => inv.supplier?.id == supplierId);
     displayInvoices(filtered);
+}
+
+function goToDashboard() {
+    window.location.href = 'index.html';
 }
